@@ -425,6 +425,8 @@ docker buildx build --platform linux/amd64 \
 
 > 注意：不要把 `.env` 提交到 Git 或打进镜像。`.gitignore` 和 `.dockerignore` 已排除该文件。
 
+服务器上的运行与 `.env` 注入步骤见 [`deploy/DEPLOY.md`](deploy/DEPLOY.md)。
+
 ## 9. 作业要求对照
 
 | 作业要求 | 对应实现 |

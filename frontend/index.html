@@ -1,0 +1,828 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>心语 · 情感支持实验</title>
+  <style>
+    :root {
+      --paper: #f4f0e8;
+      --paper-deep: #e9e2d6;
+      --card: rgba(255, 253, 249, 0.88);
+      --card-solid: #fffdf9;
+      --ink: #20302c;
+      --ink-soft: #64736e;
+      --line: rgba(32, 48, 44, 0.12);
+      --accent: #0f766e;
+      --accent-soft: #d9ede8;
+      --accent-ink: #0b5b55;
+      --positive: #0f766e;
+      --positive-soft: #dcefe9;
+      --negative: #b45309;
+      --negative-soft: #f8e7d0;
+      --neutral: #52616d;
+      --neutral-soft: #e8edf0;
+      --danger: #b42318;
+      --danger-soft: #fce8e6;
+      --shadow: 0 18px 55px rgba(59, 50, 36, 0.10);
+      --radius-lg: 26px;
+      --radius-md: 18px;
+      --font: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, -apple-system, sans-serif;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --paper: #111917;
+        --paper-deep: #0a100f;
+        --card: rgba(27, 39, 36, 0.88);
+        --card-solid: #1b2724;
+        --ink: #edf3ef;
+        --ink-soft: #9eaca6;
+        --line: rgba(237, 243, 239, 0.11);
+        --accent: #5fc4b5;
+        --accent-soft: #1e3d38;
+        --accent-ink: #9addd2;
+        --positive: #6fd0c0;
+        --positive-soft: #193b36;
+        --negative: #f0b36b;
+        --negative-soft: #422e18;
+        --neutral: #b4c1ca;
+        --neutral-soft: #2a353c;
+        --danger: #ff9c91;
+        --danger-soft: #441f1c;
+        --shadow: 0 24px 70px rgba(0, 0, 0, 0.30);
+      }
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      height: 100%;
+    }
+
+    body {
+      font-family: var(--font);
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% 0%, rgba(15, 118, 110, 0.13), transparent 38rem),
+        radial-gradient(circle at 92% 18%, rgba(180, 83, 9, 0.10), transparent 32rem),
+        linear-gradient(160deg, var(--paper) 0%, var(--paper-deep) 100%);
+      overflow: hidden;
+    }
+
+    button, textarea { font: inherit; }
+    button { color: inherit; }
+
+    .app {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      width: min(960px, 100%);
+      height: 100dvh;
+      margin: 0 auto;
+      padding: 0 22px;
+    }
+
+    .app::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.34;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.18'/%3E%3C/svg%3E");
+      mix-blend-mode: multiply;
+    }
+
+    header {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 24px 4px 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      min-width: 0;
+    }
+
+    .logo {
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      flex: 0 0 auto;
+      border-radius: 15px;
+      color: #fff;
+      font-family: "Noto Serif SC", "Songti SC", serif;
+      font-size: 22px;
+      font-weight: 700;
+      background: linear-gradient(145deg, #139589, #0b5b55);
+      box-shadow: 0 8px 22px rgba(15, 118, 110, 0.26);
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 19px;
+      letter-spacing: 0.04em;
+    }
+
+    .brand p {
+      margin: 3px 0 0;
+      color: var(--ink-soft);
+      font-size: 12px;
+      letter-spacing: 0.02em;
+    }
+
+    .badges {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 7px;
+      flex-wrap: wrap;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 28px;
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.34);
+      color: var(--ink-soft);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+      backdrop-filter: blur(10px);
+    }
+
+    .pill::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+      opacity: 0.65;
+    }
+
+    .pill.mock { color: var(--negative); border-color: color-mix(in srgb, var(--negative) 25%, transparent); }
+    .pill.live { color: var(--positive); border-color: color-mix(in srgb, var(--positive) 25%, transparent); }
+    .pill.error { color: var(--danger); }
+
+    main {
+      position: relative;
+      z-index: 1;
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      padding: 12px 4px 24px;
+      scrollbar-width: thin;
+      scrollbar-color: color-mix(in srgb, var(--ink) 20%, transparent) transparent;
+      scroll-behavior: smooth;
+    }
+
+    main::-webkit-scrollbar { width: 7px; }
+    main::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--ink) 16%, transparent); border-radius: 10px; }
+
+    .welcome {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      max-width: 620px;
+      margin: clamp(16px, 7vh, 70px) auto 0;
+      text-align: center;
+      animation: rise 0.55s ease both;
+    }
+
+    .welcome[hidden] { display: none; }
+
+    .orb {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: 86px;
+      height: 86px;
+      margin-bottom: 24px;
+      border-radius: 50%;
+      border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
+      background:
+        radial-gradient(circle at 35% 30%, rgba(255,255,255,0.8), transparent 38%),
+        linear-gradient(145deg, var(--accent-soft), color-mix(in srgb, var(--accent) 14%, var(--card-solid)));
+      box-shadow: 0 18px 45px color-mix(in srgb, var(--accent) 16%, transparent);
+    }
+
+    .orb::before, .orb::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
+    }
+
+    .orb::before { inset: -10px; animation: breathe 5s ease-in-out infinite; }
+    .orb::after { inset: -21px; opacity: 0.45; animation: breathe 5s 0.8s ease-in-out infinite; }
+
+    .orb svg { width: 35px; height: 35px; stroke: var(--accent-ink); }
+
+    .welcome h2 {
+      margin: 0;
+      font-family: "Noto Serif SC", "Songti SC", serif;
+      font-size: clamp(29px, 5vw, 42px);
+      font-weight: 600;
+      letter-spacing: 0.025em;
+    }
+
+    .welcome > p {
+      max-width: 500px;
+      margin: 15px 0 0;
+      color: var(--ink-soft);
+      font-size: 14px;
+      line-height: 1.9;
+    }
+
+    .examples {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 9px;
+      margin-top: 27px;
+    }
+
+    .example {
+      padding: 9px 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--card-solid) 64%, transparent);
+      color: var(--ink-soft);
+      font-size: 12.5px;
+      cursor: pointer;
+      transition: transform 0.16s ease, border-color 0.16s ease, color 0.16s ease, background 0.16s ease;
+    }
+
+    .example:hover {
+      transform: translateY(-1px);
+      color: var(--accent-ink);
+      border-color: color-mix(in srgb, var(--accent) 34%, transparent);
+      background: var(--accent-soft);
+    }
+
+    .messages {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      max-width: 790px;
+      margin: 0 auto;
+      padding-bottom: 8px;
+    }
+
+    .msg {
+      display: flex;
+      gap: 11px;
+      animation: rise 0.3s ease both;
+    }
+
+    .msg.user { flex-direction: row-reverse; }
+
+    .avatar {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      flex: 0 0 auto;
+      margin-top: 2px;
+      border-radius: 11px;
+      border: 1px solid var(--line);
+      background: var(--card-solid);
+      color: var(--ink-soft);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .msg.user .avatar {
+      border-color: transparent;
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .msg-body {
+      min-width: 0;
+      max-width: min(78%, 640px);
+    }
+
+    .msg.user .msg-body { max-width: min(74%, 560px); }
+
+    .bubble {
+      padding: 14px 17px;
+      border: 1px solid var(--line);
+      border-radius: 4px 20px 20px 20px;
+      background: var(--card);
+      box-shadow: 0 8px 25px rgba(47, 43, 35, 0.045);
+      font-size: 14.5px;
+      line-height: 1.85;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .msg.user .bubble {
+      border: 0;
+      border-radius: 20px 4px 20px 20px;
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 10px 28px color-mix(in srgb, var(--accent) 22%, transparent);
+    }
+
+    .msg.error .bubble {
+      border-color: color-mix(in srgb, var(--danger) 25%, transparent);
+      background: var(--danger-soft);
+      color: var(--danger);
+    }
+
+    .trace {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin: 0 0 8px 3px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .sentiment-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: var(--neutral-soft);
+      color: var(--neutral);
+    }
+
+    .sentiment-chip.positive { background: var(--positive-soft); color: var(--positive); }
+    .sentiment-chip.negative { background: var(--negative-soft); color: var(--negative); }
+
+    .sentiment-chip .dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .route-text { color: var(--ink-soft); }
+    .arrow { color: var(--ink-soft); opacity: 0.55; }
+    .confidence { color: var(--ink-soft); font-weight: 500; opacity: 0.8; }
+
+    .details {
+      margin: 7px 0 0 4px;
+      color: var(--ink-soft);
+      font-size: 11.5px;
+    }
+
+    .details summary {
+      width: fit-content;
+      cursor: pointer;
+      color: var(--ink-soft);
+      opacity: 0.78;
+      user-select: none;
+      list-style: none;
+    }
+
+    .details summary::-webkit-details-marker { display: none; }
+    .details summary::before { content: "＋ "; }
+    .details[open] summary::before { content: "－ "; }
+    .details p {
+      margin: 7px 0 0;
+      padding: 9px 11px;
+      border-left: 2px solid var(--line);
+      line-height: 1.65;
+    }
+
+    .typing .bubble {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 46px;
+      color: var(--ink-soft);
+    }
+
+    .dots { display: inline-flex; gap: 4px; }
+    .dots i {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: currentColor;
+      animation: blink 1.2s infinite;
+    }
+    .dots i:nth-child(2) { animation-delay: 0.16s; }
+    .dots i:nth-child(3) { animation-delay: 0.32s; }
+
+    footer {
+      position: relative;
+      z-index: 2;
+      width: min(790px, 100%);
+      margin: 0 auto;
+      padding: 0 0 max(14px, env(safe-area-inset-bottom));
+    }
+
+    .composer {
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+      padding: 9px 9px 9px 17px;
+      border: 1px solid color-mix(in srgb, var(--ink) 13%, transparent);
+      border-radius: 22px;
+      background: color-mix(in srgb, var(--card-solid) 91%, transparent);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+      transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .composer:focus-within {
+      border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+      box-shadow: 0 18px 55px color-mix(in srgb, var(--accent) 12%, transparent);
+    }
+
+    textarea {
+      flex: 1;
+      width: 100%;
+      min-height: 27px;
+      max-height: 132px;
+      padding: 7px 0 5px;
+      border: 0;
+      outline: 0;
+      resize: none;
+      background: transparent;
+      color: var(--ink);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    textarea::placeholder { color: var(--ink-soft); opacity: 0.65; }
+
+    .send {
+      display: grid;
+      place-items: center;
+      width: 43px;
+      height: 43px;
+      flex: 0 0 auto;
+      border: 0;
+      border-radius: 15px;
+      background: var(--accent);
+      color: #fff;
+      cursor: pointer;
+      transition: transform 0.16s ease, opacity 0.16s ease, background 0.16s ease;
+    }
+
+    .send:hover:not(:disabled) { transform: translateY(-1px) scale(1.015); background: var(--accent-ink); }
+    .send:active:not(:disabled) { transform: scale(0.97); }
+    .send:disabled { cursor: not-allowed; opacity: 0.38; }
+    .send svg { width: 18px; height: 18px; }
+
+    .footnote {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 9px 6px 0;
+      color: var(--ink-soft);
+      font-size: 10.5px;
+      line-height: 1.5;
+      opacity: 0.75;
+    }
+
+    .footnote span:last-child { text-align: right; }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(9px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes breathe {
+      0%, 100% { transform: scale(0.97); opacity: 0.5; }
+      50% { transform: scale(1.04); opacity: 1; }
+    }
+
+    @keyframes blink {
+      0%, 70%, 100% { opacity: 0.25; transform: translateY(0); }
+      35% { opacity: 1; transform: translateY(-2px); }
+    }
+
+    @media (max-width: 640px) {
+      .app { padding: 0 13px; }
+      header { padding: 16px 2px 12px; }
+      .brand p { display: none; }
+      .logo { width: 39px; height: 39px; border-radius: 13px; font-size: 20px; }
+      .brand h1 { font-size: 17px; }
+      .pill { min-height: 25px; padding: 4px 8px; font-size: 10px; }
+      .welcome { margin-top: 5vh; }
+      .welcome h2 { font-size: 28px; }
+      .welcome > p { font-size: 13px; padding: 0 8px; }
+      .examples { margin-top: 21px; }
+      .example { font-size: 11.5px; padding: 8px 11px; }
+      .msg-body { max-width: calc(100% - 40px); }
+      .msg.user .msg-body { max-width: calc(100% - 40px); }
+      .bubble { font-size: 14px; padding: 12px 14px; }
+      footer { padding-bottom: max(9px, env(safe-area-inset-bottom)); }
+      .footnote { padding-left: 3px; padding-right: 3px; font-size: 9.5px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true">心</div>
+        <div>
+          <h1>心语</h1>
+          <p>双 Agent 情感支持实验</p>
+        </div>
+      </div>
+      <div class="badges">
+        <span class="pill" id="frameworkBadge">正在连接后端</span>
+        <span class="pill" id="modeBadge">检测模式</span>
+      </div>
+    </header>
+
+    <main id="chat" aria-live="polite">
+      <section class="welcome" id="welcome">
+        <div class="orb" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"/>
+          </svg>
+        </div>
+        <h2>今天心情怎么样？</h2>
+        <p>说点什么吧。我们先用情感识别理解你，再决定是为你加油，还是陪你缓一缓。</p>
+        <div class="examples" aria-label="示例输入">
+          <button class="example" type="button" data-text="今天终于拿到了心仪公司的 offer，感觉所有的努力都值得！">收到了心仪的 offer</button>
+          <button class="example" type="button" data-text="最近工作压力好大，晚上总是睡不着，觉得自己什么都做不好。">最近压力有点大</button>
+          <button class="example" type="button" data-text="周末打算把房间收拾一下，然后去超市买点东西。">一个普通的周末计划</button>
+        </div>
+      </section>
+      <div class="messages" id="messages"></div>
+    </main>
+
+    <footer>
+      <form class="composer" id="form">
+        <textarea id="input" rows="1" maxlength="4000" placeholder="写下此刻的感受……" aria-label="输入消息"></textarea>
+        <button class="send" id="send" type="submit" aria-label="发送消息" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/>
+          </svg>
+        </button>
+      </form>
+      <div class="footnote">
+        <span>AI 回应仅供陪伴与参考，不替代专业心理咨询。</span>
+        <span id="status">等待输入</span>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const form = document.getElementById("form");
+      const input = document.getElementById("input");
+      const sendButton = document.getElementById("send");
+      const messages = document.getElementById("messages");
+      const welcome = document.getElementById("welcome");
+      const chat = document.getElementById("chat");
+      const frameworkBadge = document.getElementById("frameworkBadge");
+      const modeBadge = document.getElementById("modeBadge");
+      const status = document.getElementById("status");
+      const exampleButtons = document.querySelectorAll(".example");
+
+      const FRAMEWORK_LABELS = {
+        "langgraph": "LangGraph 后端",
+        "openai-agents": "OpenAI Agents 后端"
+      };
+      const SENTIMENT_LABELS = {
+        positive: "正向",
+        negative: "负向",
+        neutral: "中性"
+      };
+      const ROUTE_LABELS = {
+        encourage: "鼓励模式",
+        comfort: "排解模式",
+        neutral: "陪伴模式"
+      };
+
+      let busy = false;
+
+      function el(tag, className, text) {
+        const node = document.createElement(tag);
+        if (className) node.className = className;
+        if (text !== undefined) node.textContent = text;
+        return node;
+      }
+
+      function setBusy(value, label) {
+        busy = value;
+        sendButton.disabled = value || !input.value.trim();
+        status.textContent = label || (value ? "处理中…" : "等待输入");
+      }
+
+      function scrollToBottom() {
+        requestAnimationFrame(() => {
+          chat.scrollTo({ top: chat.scrollHeight, behavior: "smooth" });
+        });
+      }
+
+      function autoResize() {
+        input.style.height = "auto";
+        input.style.height = Math.min(input.scrollHeight, 132) + "px";
+      }
+
+      function hideWelcome() {
+        if (!welcome.hidden) welcome.hidden = true;
+      }
+
+      function addUserMessage(text) {
+        hideWelcome();
+        const article = el("article", "msg user");
+        article.appendChild(el("div", "avatar", "你"));
+        const body = el("div", "msg-body");
+        body.appendChild(el("div", "bubble", text));
+        article.appendChild(body);
+        messages.appendChild(article);
+        scrollToBottom();
+      }
+
+      function addTyping() {
+        const article = el("article", "msg assistant typing");
+        article.appendChild(el("div", "avatar", "AI"));
+        const body = el("div", "msg-body");
+        const bubble = el("div", "bubble");
+        const dots = el("span", "dots");
+        dots.appendChild(el("i"));
+        dots.appendChild(el("i"));
+        dots.appendChild(el("i"));
+        bubble.appendChild(el("span", "", "情感识别中"));
+        bubble.appendChild(dots);
+        body.appendChild(bubble);
+        article.appendChild(body);
+        messages.appendChild(article);
+        scrollToBottom();
+        return article;
+      }
+
+      function addAssistantMessage(data) {
+        const article = el("article", "msg assistant");
+        article.appendChild(el("div", "avatar", "AI"));
+        const body = el("div", "msg-body");
+
+        const trace = el("div", "trace");
+        const sentiment = data.sentiment || {};
+        const label = sentiment.label || "neutral";
+        const chip = el("span", "sentiment-chip " + label);
+        chip.appendChild(el("span", "dot"));
+        chip.appendChild(document.createTextNode(SENTIMENT_LABELS[label] || label));
+        trace.appendChild(chip);
+        trace.appendChild(el("span", "arrow", "→"));
+        trace.appendChild(el("span", "route-text", ROUTE_LABELS[data.route] || data.route || "回应"));
+        if (typeof sentiment.confidence === "number") {
+          trace.appendChild(el("span", "confidence", "置信度 " + Math.round(sentiment.confidence * 100) + "%"));
+        }
+        body.appendChild(trace);
+        body.appendChild(el("div", "bubble", data.reply || "（模型没有返回文字）"));
+
+        if (sentiment.reason) {
+          const details = el("details", "details");
+          details.appendChild(el("summary", "", "查看识别依据与耗时"));
+          details.appendChild(el("p", "", sentiment.reason));
+          const meta = [];
+          if (typeof data.elapsed_ms === "number") {
+            meta.push("处理耗时 " + (data.elapsed_ms / 1000).toFixed(2) + " 秒");
+          }
+          if (data.mode === "mock") meta.push("离线规则演示模式");
+          if (meta.length) {
+            details.appendChild(el("p", "", meta.join(" · ")));
+          }
+          body.appendChild(details);
+        }
+
+        article.appendChild(body);
+        messages.appendChild(article);
+        scrollToBottom();
+      }
+
+      function addErrorMessage(text) {
+        const article = el("article", "msg assistant error");
+        article.appendChild(el("div", "avatar", "!"));
+        const body = el("div", "msg-body");
+        body.appendChild(el("div", "bubble", text || "请求失败，请稍后重试。"));
+        article.appendChild(body);
+        messages.appendChild(article);
+        scrollToBottom();
+      }
+
+      async function sendMessage(text) {
+        const message = text.trim();
+        if (!message || busy) return;
+
+        setBusy(true, "处理中…");
+        input.value = "";
+        autoResize();
+        addUserMessage(message);
+        const typing = addTyping();
+        let failed = false;
+
+        try {
+          const response = await fetch("/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message })
+          });
+          let payload = null;
+          try { payload = await response.json(); } catch (_) { /* non-JSON error */ }
+
+          if (!response.ok) {
+            const detail = payload && payload.detail;
+            throw new Error(typeof detail === "string" ? detail : "请求失败（HTTP " + response.status + "）");
+          }
+          if (!payload) throw new Error("后端返回了无法解析的内容。");
+          typing.remove();
+          addAssistantMessage(payload);
+          status.textContent = "回应已生成";
+        } catch (error) {
+          failed = true;
+          typing.remove();
+          addErrorMessage(error && error.message ? error.message : "网络异常，请检查后端是否启动。");
+        } finally {
+          setBusy(false, failed ? "请求失败" : "等待输入");
+          input.focus();
+        }
+      }
+
+      async function checkHealth() {
+        try {
+          const response = await fetch("/api/health");
+          const data = await response.json();
+          frameworkBadge.textContent = FRAMEWORK_LABELS[data.framework] || "后端已连接";
+          frameworkBadge.className = "pill";
+          if (data.mode === "mock") {
+            modeBadge.textContent = "离线演示";
+            modeBadge.className = "pill mock";
+          } else {
+            modeBadge.textContent = data.api_key_configured ? "在线模型" : "缺少 API Key";
+            modeBadge.className = "pill " + (data.api_key_configured ? "live" : "error");
+          }
+          if (data.status === "degraded") {
+            status.textContent = "尚未配置 API Key";
+          }
+        } catch (_) {
+          frameworkBadge.textContent = "后端未连接";
+          frameworkBadge.className = "pill error";
+          modeBadge.textContent = "请先启动服务";
+          modeBadge.className = "pill error";
+        }
+      }
+
+      input.addEventListener("input", () => {
+        autoResize();
+        sendButton.disabled = busy || !input.value.trim();
+      });
+
+      input.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" && !event.shiftKey && !event.isComposing) {
+          event.preventDefault();
+          form.requestSubmit();
+        }
+      });
+
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        sendMessage(input.value);
+      });
+
+      exampleButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          input.value = button.dataset.text || "";
+          autoResize();
+          sendButton.disabled = busy || !input.value.trim();
+          sendMessage(input.value);
+        });
+      });
+
+      checkHealth();
+      input.focus();
+    })();
+  </script>
+</body>
+</html>

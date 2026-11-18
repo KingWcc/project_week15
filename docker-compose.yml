@@ -1,0 +1,19 @@
+services:
+  sentiment-support:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.org/simple}
+    image: week15-sentiment-agent:1.0
+    container_name: week15-sentiment-agent
+    ports:
+      - "${APP_PORT:-8000}:8000"
+    environment:
+      LLM_MODE: ${LLM_MODE:-llm}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_BASE_URL: ${OPENAI_BASE_URL:-https://api.deepseek.com}
+      OPENAI_MODEL: ${OPENAI_MODEL:-deepseek-chat}
+      REQUEST_TIMEOUT: ${REQUEST_TIMEOUT:-90}
+      CORS_ORIGINS: "${CORS_ORIGINS:-*}"
+    restart: unless-stopped

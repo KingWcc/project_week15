@@ -1,0 +1,6 @@
+# Runtime dependencies for the OpenAI Agents SDK version (the Docker image).
+openai-agents==0.19.4
+fastapi==0.139.2
+uvicorn==0.52.0
+python-dotenv==1.2.2
+pydantic==2.13.4

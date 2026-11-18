@@ -1,0 +1,7 @@
+# Runtime dependencies for the LangGraph version.
+langgraph==1.2.10
+langchain-openai==1.4.1
+fastapi==0.139.2
+uvicorn==0.52.0
+python-dotenv==1.2.2
+pydantic==2.13.4

@@ -1,0 +1,3 @@
+# Install both assignment 1 implementations.
+-r requirements-openai-agents.txt
+-r requirements-langgraph.txt

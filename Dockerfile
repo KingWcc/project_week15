@@ -1,10 +1,13 @@
-# syntax=docker/dockerfile:1
 #
 # Homework 2: container image for the OpenAI Agents SDK implementation.
 # Secrets are deliberately NOT baked into the image. Supply OPENAI_API_KEY at
 # runtime with --env-file, docker compose, or your orchestrator's secret store.
+#
+# 不使用 # syntax=docker/dockerfile:1：ACR 构建环境访问 Docker Hub 会超时。
+# 基础镜像默认走国内镜像源，可用 --build-arg BASE_IMAGE=... 覆盖。
 
-FROM python:3.12-slim AS runtime
+ARG BASE_IMAGE=docker.m.daocloud.io/library/python:3.12-slim
+FROM ${BASE_IMAGE} AS runtime
 
 ARG PIP_INDEX_URL=https://pypi.org/simple
 

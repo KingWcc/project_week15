@@ -331,7 +331,8 @@ OK
 
 ### 8.1 Dockerfile 设计
 
-- 基础镜像 `python:3.12-slim`；
+- 基础镜像 `python:3.12-slim`，默认从国内镜像源 `docker.m.daocloud.io` 拉取，可用 `BASE_IMAGE` 构建参数覆盖；
+- 不使用 `# syntax=docker/dockerfile:1`，避免云端构建时访问 Docker Hub 超时；
 - 只安装 OpenAI Agents 版本运行依赖（不安装 LangGraph，减小镜像）；
 - 依赖层与源码层分离，改代码不会重复安装依赖；
 - 使用非 root 用户 `appuser` 运行；

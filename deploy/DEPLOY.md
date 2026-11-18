@@ -8,7 +8,26 @@
 
 - 服务器已安装 Docker（`docker --version` 能输出版本）。
 - ACR 里已经构建好镜像，例如：
-  `registry.cn-hangzhou.aliyuncs.com/<命名空间>/week15-sentiment-agent:latest`
+  `crpi-svlhwbrf12hgphb3.cn-hangzhou.personal.cr.aliyuncs.com/project_week15/project_week15:1.0`
+
+## 0.1 直接构建并推送（Codeup 绑定不上时用这个）
+
+ACR 个人版绑定不了 Codeup 个人实例时，可以跳过 Git 绑定，直接在一台装有 Docker 的机器（ECS/服务器）上构建并推送：
+
+```bash
+git clone https://peronal0212-cn-hangzhou.devops.aliyuncs.com/codeup/peronal0212/project_week15.git week15
+cd week15
+chmod +x deploy/build-and-push.sh
+./deploy/build-and-push.sh          # 默认 tag 1.0，登录密码按提示输入
+```
+
+脚本会依次执行 `docker login`、`docker build`、`docker push`。ECS 与 ACR 同地域时用 VPC 地址更快、也省公网流量：
+
+```bash
+REGISTRY=crpi-svlhwbrf12hgphb3-vpc.cn-hangzhou.personal.cr.aliyuncs.com ./deploy/build-and-push.sh
+```
+
+构建期间默认走阿里云 PyPI 镜像；想用官方源可加 `PIP_INDEX_URL=https://pypi.org/simple`。
 
 ## 1. 从 Windows 上传文件
 
@@ -35,7 +54,7 @@ ssh -p <端口> <user>@<server> "chmod 600 /opt/week15/deploy/.env"
 ssh -p <端口> <user>@<server>
 cd /opt/week15/deploy
 
-export IMAGE=registry.cn-hangzhou.aliyuncs.com/<命名空间>/week15-sentiment-agent:latest
+export IMAGE=crpi-svlhwbrf12hgphb3.cn-hangzhou.personal.cr.aliyuncs.com/project_week15/project_week15:1.0
 chmod +x deploy.sh
 ./deploy.sh
 ```
@@ -43,13 +62,13 @@ chmod +x deploy.sh
 如果镜像仓库是私有的，先登录：
 
 ```bash
-docker login --username=<阿里云账号> registry.cn-hangzhou.aliyuncs.com
+docker login --username=aliyun1023347068 crpi-svlhwbrf12hgphb3.cn-hangzhou.personal.cr.aliyuncs.com
 ```
 
 也可以改用 Compose：
 
 ```bash
-export IMAGE=registry.cn-hangzhou.aliyuncs.com/<命名空间>/week15-sentiment-agent:latest
+export IMAGE=crpi-svlhwbrf12hgphb3.cn-hangzhou.personal.cr.aliyuncs.com/project_week15/project_week15:1.0
 docker compose up -d
 docker compose logs -f
 ```
@@ -68,11 +87,11 @@ docker logs --tail 50 week15-sentiment-agent
 
 ```bash
 # 更新到新镜像
-export IMAGE=registry.cn-hangzhou.aliyuncs.com/<命名空间>/week15-sentiment-agent:1.0
+export IMAGE=crpi-svlhwbrf12hgphb3.cn-hangzhou.personal.cr.aliyuncs.com/project_week15/project_week15:1.0
 ./deploy.sh
 
 # 回退到上一个 tag
-export IMAGE=registry.cn-hangzhou.aliyuncs.com/<命名空间>/week15-sentiment-agent:0.9
+export IMAGE=crpi-svlhwbrf12hgphb3.cn-hangzhou.personal.cr.aliyuncs.com/project_week15/project_week15:0.9
 ./deploy.sh
 ```
 
